@@ -1,0 +1,35 @@
+name: Actualizar Lista TV
+
+on:
+  schedule:
+    - cron: '0 8 * * *' # Se ejecuta a las 8:00 AM UTC todos los días
+  workflow_dispatch: # Te permite darle al botón "Run" manualmente si quieres
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Chequear código
+        uses: actions/checkout@v3
+
+      - name: Instalar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Instalar librerías
+        run: pip install requests
+
+      - name: Ejecutar script
+        run: python json_a_m3u.py
+
+      - name: Guardar cambios (Commit & Push)
+        run: |
+          git config --global user.name "Actualizador Bot"
+          git config --global user.email "bot@noreply.com"
+          git add lista.m3u
+          git commit -m "Actualización diaria automática" || exit 0
+          git push
